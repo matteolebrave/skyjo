@@ -208,11 +208,11 @@ async def handler(websocket):
             elif message.type == aiohttp.WSMsgType.ERROR:
                 print(f"Erreur WebSocket : {websocket.exception()}")
     except Exception as e:
+        global GAME, NB_PLAYERS, RESTART_VOTES, READY_VOTES
         print(f"Déconnexion : {e}")
         if websocket in CLIENTS:
             name = CLIENTS[websocket].name
             del CLIENTS[websocket]
-            global GAME, NB_PLAYERS, RESTART_VOTES, READY_VOTES
             GAME = None
             NB_PLAYERS = None
             RESTART_VOTES = set()
