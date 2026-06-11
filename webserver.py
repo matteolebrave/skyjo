@@ -179,31 +179,29 @@ async def handler(websocket):
     try:
         async for message in websocket:
             print("message reçu =", message)
-
             if message.type == aiohttp.WSMsgType.TEXT:
                 data = json.loads(message.data)
-            if data.get("action") == "join" and websocket not in CLIENTS:
-                global NB_PLAYERS, GAME
-                print(f"join reçu : {data['name']}")
-                player_name = data["name"]
-                player = Player(player_name)
-                CLIENTS[websocket] = player
-                print(f"{player_name} connecté")
-                await websocket.send_str(json.dumps({"type": "your_name", "name": player_name}))
-
-                if len(CLIENTS) == 1:
-                    NB_PLAYERS = data.get("nb_players", 2)
-                    print(f"Partie créée pour {NB_PLAYERS} joueurs")
-
-                await broadcast({"type": "waiting", "current": len(CLIENTS), "total": NB_PLAYERS})
-
-                if len(CLIENTS) == NB_PLAYERS:
-                    GAME = Game(list(CLIENTS.values()))
-                    GAME.setup_round()
-                    await broadcast({"type": "game_start"})
-                    await broadcast(game_state())
-            else:
-                await handle_action(websocket, data)
+                if data.get("action") == "join" and websocket not in CLIENTS:  # ← indenté ici
+                    global NB_PLAYERS, GAME
+                    print(f"join reçu : {data['name']}")
+                    player_name = data["name"]
+                    player = Player(player_name)
+                    CLIENTS[websocket] = player
+                    print(f"{player_name} connecté")
+                    await websocket.send_str(json.dumps({"type": "your_name", "name": player_name}))
+                    if len(CLIENTS) == 1:
+                        NB_PLAYERS = data.get("nb_players", 2)
+                        print(f"Partie créée pour {NB_PLAYERS} joueurs")
+                    await broadcast({"type": "waiting", "current": len(CLIENTS), "total": NB_PLAYERS})
+                    if len(CLIENTS) == NB_PLAYERS:
+                        GAME = Game(list(CLIENTS.values()))
+                        GAME.setup_round()
+                        await broadcast({"type": "game_start"})
+                        await broadcast(game_state())
+                else:
+                    await handle_action(websocket, data)
+            elif message.type == aiohttp.WSMsgType.ERROR:
+                print(f"Erreur WebSocket : {websocket.exception()}")
     except Exception as e:
         print(f"Déconnexion : {e}")
         if websocket in CLIENTS:
