@@ -48,7 +48,14 @@ def game_state():
 async def broadcast(buffer):
     if CLIENTS:
         data = json.dumps(buffer)
-        await asyncio.gather(*[ws.send_str(data) for ws in CLIENTS])
+        dead = []
+        for ws in CLIENTS:
+            try:
+                await ws.send_str(data)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            del CLIENTS[ws]
 
 
 async def end_round_check():
@@ -213,9 +220,10 @@ async def handler(websocket):
             name = CLIENTS[websocket].name
             del CLIENTS[websocket]
             GAME = None
-            NB_PLAYERS = None
             RESTART_VOTES = set()
             READY_VOTES = set()
+            if len(CLIENTS) == 0:
+                NB_PLAYERS = None  # ← seulement si plus personne
             await broadcast({"type": "player_disconnected", "name": name})
 
 

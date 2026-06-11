@@ -321,7 +321,7 @@ function updateUI(state) {
 
     // Boutons d'action
     const actions = document.createElement("div");
-
+    console.log("state.drawn_from =", state.drawn_from);
     // Piocher — caché si carte déjà piochée
     if (state.drawn_card === null) {
         const btnDeck = document.createElement("button");
