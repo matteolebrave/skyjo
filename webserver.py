@@ -178,7 +178,10 @@ async def handler(websocket):
     print("Nouvelle connexion")
     try:
         async for message in websocket:
-            data = json.loads(message)
+            print("message reçu =", message)
+
+            if message.type == aiohttp.WSMsgType.TEXT:
+                data = json.loads(message.data)
             if data.get("action") == "join" and websocket not in CLIENTS:
                 global NB_PLAYERS, GAME
                 print(f"join reçu : {data['name']}")

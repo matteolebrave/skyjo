@@ -8,6 +8,10 @@ const host = window.location.hostname === "localhost"
     : window.location.host;
 
 const ws = new WebSocket(`${protocol}//${host}/ws`);
+
+console.log("protocol =", protocol);
+console.log("host =", host);
+console.log("url =", `${protocol}//${host}/ws`);
 // 
 
 let myName = null;
