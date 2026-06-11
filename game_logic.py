@@ -40,17 +40,17 @@ class Player:
         return total
     
     def is_done(self):
-        count = 0
-        for row in self.hand:
-            for card in row:
-                if card.visible:
-                    count += 1
-        return count >= 2 
-        #for row in range(3):
-        #    for col in range(len(self.hand[0])):
-        #            if not self.hand[row][col].visible:
-        #                return False
-        #return True
+        #count = 0
+        #for row in self.hand:
+        #    for card in row:
+        #        if card.visible:
+        #            count += 1
+        #return count >= 2 
+        for row in range(3):
+            for col in range(len(self.hand[0])):
+                    if not self.hand[row][col].visible:
+                        return False
+        return True
     
     def __repr__(self):
         rows = []
