@@ -180,6 +180,7 @@ async def handle_action(websocket, data):
         await websocket.send_str(json.dumps({"type": "error", "message": str(e)}))
 
 async def handler(websocket):
+    global GAME, NB_PLAYERS, RESTART_VOTES, READY_VOTES
     print("Nouvelle connexion")
     try:
         async for message in websocket:
@@ -187,7 +188,6 @@ async def handler(websocket):
             if message.type == aiohttp.WSMsgType.TEXT:
                 data = json.loads(message.data)
                 if data.get("action") == "join" and websocket not in CLIENTS:  # ← indenté ici
-                    global NB_PLAYERS, GAME
                     print(f"join reçu : {data['name']}")
                     player_name = data["name"]
                     player = Player(player_name)
@@ -208,7 +208,6 @@ async def handler(websocket):
             elif message.type == aiohttp.WSMsgType.ERROR:
                 print(f"Erreur WebSocket : {websocket.exception()}")
     except Exception as e:
-        global GAME, NB_PLAYERS, RESTART_VOTES, READY_VOTES
         print(f"Déconnexion : {e}")
         if websocket in CLIENTS:
             name = CLIENTS[websocket].name
