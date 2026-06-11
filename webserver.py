@@ -43,8 +43,6 @@ def game_state():
     "drawn_from": GAME.drawn_from
     }
 
-
-
 async def broadcast(buffer):
     if CLIENTS:
         data = json.dumps(buffer)
@@ -56,7 +54,6 @@ async def broadcast(buffer):
                 dead.append(ws)
         for ws in dead:
             del CLIENTS[ws]
-
 
 async def end_round_check():
     GAME.apply_scores()
@@ -226,13 +223,21 @@ async def handler(websocket):
                 NB_PLAYERS = None  # ← seulement si plus personne
             await broadcast({"type": "player_disconnected", "name": name})
 
-
 async def websocket_handler(request):
     ws = web.WebSocketResponse()
     print("test")
     await ws.prepare(request)
     await handler(ws)
     return ws
+
+async def reset_server(request):
+    global GAME, NB_PLAYERS, RESTART_VOTES, READY_VOTES, CLIENTS
+    GAME = None
+    NB_PLAYERS = None
+    RESTART_VOTES = set()
+    READY_VOTES = set()
+    CLIENTS = {}
+    return web.Response(text="Serveur réinitialisé !")
 
 async def main():
     app = web.Application()

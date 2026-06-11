@@ -370,3 +370,9 @@ function cardClass(card) {
     if (card.value <= 10) return "card val-high";
     return "card val-max";
 }
+
+function resetServer() {
+    fetch('/reset')
+        .then(() => alert("Serveur réinitialisé ! Vous pouvez relancer une partie."))
+        .catch(() => alert("Erreur lors de la réinitialisation."));
+}
