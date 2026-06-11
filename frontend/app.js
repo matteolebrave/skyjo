@@ -166,9 +166,33 @@ ws.onmessage = (event) => {
         document.getElementById("login").style.display = "none";
         const game = document.getElementById("game");
         game.innerHTML = `<p>En attente des joueurs... ${data.current}/${data.total}</p>`;
-}
+    }
+    else if (data.type === "player_disconnected") {
+        const game = document.getElementById("game");
+        game.innerHTML = `
+            <div style="text-align:center; padding: 2rem;">
+                <h2>Connexion perdue</h2>
+                <p>${data.name} s'est déconnecté.</p>
+                <button class="btn-restart" onclick="location.reload()">
+                    Retourner à l'accueil
+                </button>
+            </div>
+        `;
+    }
 };
 
+ws.onclose = () => {
+    const game = document.getElementById("game");
+    game.innerHTML = `
+        <div style="text-align:center; padding: 2rem;">
+            <h2>Connexion perdue</h2>
+            <p>La connexion au serveur a été interrompue.</p>
+            <button class="btn-restart" onclick="location.reload()">
+                Retourner à l'accueil
+            </button>
+        </div>
+    `;
+};
 // Envoi d'une action au serveur
 function sendAction(action) {
     ws.send(JSON.stringify(action));
@@ -298,19 +322,26 @@ function updateUI(state) {
     // Boutons d'action
     const actions = document.createElement("div");
 
-    const btnDeck = document.createElement("button");
-    btnDeck.className = "btn-deck";
-    btnDeck.textContent = "Piocher";
-    btnDeck.onclick = () => sendAction({ action: "draw_deck" });
-    actions.appendChild(btnDeck);
+    // Piocher — caché si carte déjà piochée
+    if (state.drawn_card === null) {
+        const btnDeck = document.createElement("button");
+        btnDeck.className = "btn-deck";
+        btnDeck.textContent = "Piocher";
+        btnDeck.onclick = () => sendAction({ action: "draw_deck" });
+        actions.appendChild(btnDeck);
+    }
 
-    const btnDiscard = document.createElement("button");
-    btnDiscard.className = "btn-discard";
-    btnDiscard.textContent = "Prendre la défausse";
-    btnDiscard.onclick = () => sendAction({ action: "draw_discard" });
-    actions.appendChild(btnDiscard);
+    // Prendre la défausse — caché si carte déjà piochée
+    if (state.drawn_card === null) {
+        const btnDiscard = document.createElement("button");
+        btnDiscard.className = "btn-discard";
+        btnDiscard.textContent = "Prendre la défausse";
+        btnDiscard.onclick = () => sendAction({ action: "draw_discard" });
+        actions.appendChild(btnDiscard);
+    }
 
-    if (state.drawn_card !== null) {
+    // Défausser — caché si carte vient de la défausse
+    if (state.drawn_card !== null && state.drawn_from !== "discard") {
         const btnDefausser = document.createElement("button");
         btnDefausser.className = "btn-defausser";
         btnDefausser.textContent = "Défausser la carte piochée";

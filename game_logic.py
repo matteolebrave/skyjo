@@ -105,11 +105,13 @@ class Game:
         self.reveals = {player: 0 for player in self.players}
         self.drawn_card = None
         self.must_reveal = False
+        self.drawn_from = None
 
     def next_player(self):
         self.current_player_index = (self.current_player_index + 1) % len(self.players)
 
     def draw_from_deck(self):
+        self.drawn_from = "deck"
         if len(self.deck) == 0:
             tmp = self.discard
             self.discard = [tmp.pop()]

@@ -39,7 +39,8 @@ def game_state():
     "drawn_card": drawn_card,
     "must_reveal": GAME.must_reveal,
     "hands": hands,
-    "scores": scores
+    "scores": scores,
+    "drawn_from": GAME.drawn_from
     }
 
 
@@ -133,10 +134,12 @@ async def handle_action(websocket, data):
                 return
             if action == "draw_deck":
                 GAME.drawn_card = GAME.draw_from_deck()
+                GAME.draw_from = "deck"
                 await broadcast(game_state())
 
             elif action == "draw_discard":
                 GAME.drawn_card = GAME.draw_from_discard()
+                GAME.draw_from = "discard"
                 await broadcast(game_state())
 
             elif action == "place_card":
@@ -161,6 +164,8 @@ async def handle_action(websocket, data):
             elif action == "reveal_card" and GAME.must_reveal:
                 row, col = data["row"], data["col"]
                 current.reveal_card(row, col)
+                removed = current.check_column()    
+                GAME.discard.extend(removed) 
                 GAME.must_reveal = False
                 if GAME.check_end_round():
                     await end_round_check()
@@ -205,8 +210,14 @@ async def handler(websocket):
     except Exception as e:
         print(f"Déconnexion : {e}")
         if websocket in CLIENTS:
-            print(f"{CLIENTS[websocket].name} déconnecté")
+            name = CLIENTS[websocket].name
             del CLIENTS[websocket]
+            global GAME, NB_PLAYERS, RESTART_VOTES, READY_VOTES
+            GAME = None
+            NB_PLAYERS = None
+            RESTART_VOTES = set()
+            READY_VOTES = set()
+            await broadcast({"type": "player_disconnected", "name": name})
 
 
 async def websocket_handler(request):
