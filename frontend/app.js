@@ -1,7 +1,3 @@
-//const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-//const host = window.location.hostname === "localhost" ? "localhost:8765" : window.location.host;
-//const ws = new WebSocket(`${protocol}//${host}`);
-
 const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 const host = window.location.hostname === "localhost"
     ? "localhost:8765"
