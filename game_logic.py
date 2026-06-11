@@ -111,7 +111,6 @@ class Game:
         self.current_player_index = (self.current_player_index + 1) % len(self.players)
 
     def draw_from_deck(self):
-        self.drawn_from = "deck"
         if len(self.deck) == 0:
             tmp = self.discard
             self.discard = [tmp.pop()]

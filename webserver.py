@@ -138,12 +138,12 @@ async def handle_action(websocket, data):
                 return
             if action == "draw_deck":
                 GAME.drawn_card = GAME.draw_from_deck()
-                GAME.draw_from = "deck"
+                GAME.drawn_from = "deck"
                 await broadcast(game_state())
 
             elif action == "draw_discard":
                 GAME.drawn_card = GAME.draw_from_discard()
-                GAME.draw_from = "discard"
+                GAME.drawn_from = "discard"
                 await broadcast(game_state())
 
             elif action == "place_card":
