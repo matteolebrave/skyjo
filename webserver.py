@@ -243,6 +243,7 @@ async def main():
     app = web.Application()
     app.router.add_get('/', serve_frontend)
     app.router.add_get('/ws', websocket_handler)
+    app.router.add_get('/reset', reset_server) 
     app.router.add_static('/frontend', './frontend')
     print(app)
 
